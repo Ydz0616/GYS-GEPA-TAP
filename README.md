@@ -72,7 +72,6 @@ the reference implementation (`ATTACK_TEMP=1`, `TARGET_TEMP=0`, evaluator at 0).
 | `--keep-last-n` | 3 | attacker conversation turns retained |
 | `--early-stop-score` | 10 | judge score that ends the run |
 | `--max-metric-calls` | 12 | GEPA budget (one call = one full TAP run) |
-| `--reflection-minibatch-size` | 1 | tasks per reflection step |
 | `--seed` | 0 | RNG seed for pruning and splits |
 | `--task-ids`, `--categories`, `--limit` | index 1 | AdvBench task selection |
 | `--split` | `train` | `train`, `test`, or `heldout` |
@@ -95,8 +94,8 @@ One GEPA optimization run (each metric call is a full TAP run, so keep the budge
 Score a specific prompt version on a split, and render a run:
 
 ```bash
-.venv/bin/gys eval --prompt-version 3 --split heldout
-.venv/bin/gys report --run-id <run_id>
+.venv/bin/gys eval --prompt-version attacker_v000 --split heldout
+.venv/bin/gys report runs/<run_id>
 ```
 
 Add `--mock` to any command to run the whole pipeline against scripted responses with
@@ -114,10 +113,11 @@ v1 optimizes a single task (index 1) and evaluates that task plus a small heldou
 Prompt versions are content-addressed and committed:
 
 ```
-prompts/attacker/v000-<sha8>.md     # verbatim TAP attacker prompt
-prompts/judge/v000-<sha8>.md
-prompts/reflector/v000-<sha8>.md
-prompts/manifest.json               # version, sha256, parent, scores, run_id
+prompts/attacker/attacker_v000.md      # verbatim TAP attacker seed prompt
+prompts/attacker/manifest.json         # version id, sha256, parent, source, created_at
+prompts/judge/judge_v000.md            # GEPA-side judge prompt
+prompts/reflector/reflector_v000.md    # reflection prompt template
+prompts/tap/{judge,on_topic}_v000.md   # verbatim TAP in-loop evaluator prompts
 ```
 
 Each run writes `runs/<run_id>/`:
@@ -127,9 +127,9 @@ Each run writes `runs/<run_id>/`:
 | `config.json` | resolved config, models, splits, seeds, prompt versions |
 | `tap.jsonl` | one record per tree node: prompts, responses, scores, prune reason |
 | `judge.jsonl` | judge calls: raw output, parsed rubric scores, `side_info` |
-| `reflector.jsonl` | proposals: parent version, rendered prompt, new prompt sha |
-| `gepa.jsonl` | engine events: candidates accepted/rejected, budget spent |
-| `summary.json` | best candidate, per-split scores, token usage |
+| `reflector.jsonl` | one record per reflection step: component and record count |
+| `gepa.jsonl` | GEPA run summary: best version, best index, metric calls |
+| `summary.json` | resolved result: best/seed versions, scores, token usage |
 
 ## Metric
 
