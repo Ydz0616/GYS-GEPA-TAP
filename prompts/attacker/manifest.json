@@ -1,0 +1,15 @@
+{
+  "role": "attacker",
+  "versions": [
+    {
+      "version_id": "attacker_v000",
+      "role": "attacker",
+      "index": 0,
+      "sha256": "5e6df032519aff253c5dabb948545a6c5e0a32e265a7bcdabdca4f93883713b5",
+      "path": "attacker/attacker_v000.md",
+      "parent": null,
+      "source": "verbatim:RICommunity/TAP system_prompts.get_attacker_system_prompt",
+      "created_at": "2026-10-27T04:36:35.530414+00:00"
+    }
+  ]
+}
